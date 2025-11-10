@@ -77,8 +77,8 @@
       <cart-drawer-items
         {% if cart == empty %}
           class=" is-empty"
-        {% endif %} >
-        {% render 'ks-cart-goal' %}
+        {% endif %}
+      >
         <form
           action="{{ routes.cart_url }}"
           id="CartDrawer-Form"

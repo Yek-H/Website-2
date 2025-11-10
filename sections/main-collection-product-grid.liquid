@@ -22,6 +22,16 @@
   <script src="{{ 'quick-order-list.js' | asset_url }}" defer="defer"></script>
 {%- endif -%}
 
+{%- liquid
+  assign products_per_row = section.settings.columns_desktop
+  assign mobile_columns = section.settings.columns_mobile | plus: 0
+
+  assign eager_limit = products_per_row
+  if mobile_columns == 1
+    assign eager_limit = 2
+  endif
+-%}
+
 {%- style -%}
   .section-{{ section.id }}-padding {
     padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
@@ -33,6 +43,11 @@
       padding-top: {{ section.settings.padding_top }}px;
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
+  }
+
+  /* Show sale price in red */
+  .price .price-item--sale {
+    color: rgb(255, 0, 0); 
   }
 {%- endstyle -%}
 
@@ -154,10 +169,12 @@
             >
               {% assign skip_card_product_styles = false %}
               {%- for product in collection.products -%}
-                {% assign lazy_load = false %}
-                {%- if forloop.index > 2 -%}
-                  {%- assign lazy_load = true -%}
-                {%- endif -%}
+                {%- liquid
+                  assign lazy_load = true
+                  if forloop.index <= eager_limit
+                    assign lazy_load = false
+                  endif
+                -%}
                 <li
                   class="grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
                   {% if settings.animations_reveal_on_scroll %}
@@ -233,7 +250,7 @@
           "label": "t:sections.main-collection-product-grid.settings.columns_mobile.options__2.label"
         }
       ]
-    },    
+    },
     {
       "type": "color_scheme",
       "id": "color_scheme",
